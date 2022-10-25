@@ -19,6 +19,7 @@
 #include "levels/intro/header.h"
 
 const LevelScript level_intro_splash_screen[] = {
+    JUMP(script_intro_L2), // jump straight to level select on boot
     INIT_LEVEL(),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
@@ -107,7 +108,7 @@ const LevelScript level_intro_entry_4[] = {
     FREE_LEVEL_POOL(),
     LOAD_AREA(/*area*/ 1),
     SET_MENU_MUSIC(/*seq*/ SEQ_MENU_TITLE_SCREEN),
-    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    // TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
     SLEEP(/*frames*/ 16),
     CALL_LOOP(/*arg*/ LVL_INTRO_LEVEL_SELECT, /*func*/ lvl_intro_update),
     JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, script_intro_L5),

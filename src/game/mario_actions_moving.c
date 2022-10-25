@@ -216,7 +216,6 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     if (m->forwardVel > 200.0f && m->action == ACT_BUTT_SLIDE) {
         // m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
         // m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
-        set_mario_action(m, ACT_SLEEPING, 0);
     }
 
     if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
@@ -1881,6 +1880,7 @@ s32 act_long_jump_land(struct MarioState *m) {
 
 s32 act_double_jump_land(struct MarioState *m) {
     if (common_landing_cancels(m, &sDoubleJumpLandAction, set_triple_jump_action)) {
+        m->vel[1] += 30.0f;
         return TRUE;
     }
     common_landing_action(m, MARIO_ANIM_LAND_FROM_DOUBLE_JUMP, ACT_FREEFALL);
