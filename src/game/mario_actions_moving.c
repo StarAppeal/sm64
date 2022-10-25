@@ -135,22 +135,27 @@ void check_ledge_climb_down(struct MarioState *m) {
 }
 
 void slide_bonk(struct MarioState *m, u32 fastAction, u32 slowAction) {
-    if (m->forwardVel > 16.0f) {
+    // if (m->forwardVel > 16.0f) {
         mario_bonk_reflection(m, TRUE);
-        drop_and_set_mario_action(m, fastAction, 0);
-    } else {
-        mario_set_forward_vel(m, 0.0f);
-        set_mario_action(m, slowAction, 0);
-    }
+        // drop_and_set_mario_action(m, fastAction, 0);
+        print_text(98, 50, "bonk");
+        print_text_fmt_int(134, 70, "%d", m->action); // 'X' glyph
+        if (m->action == ACT_STOMACH_SLIDE) {
+            set_mario_action(m, ACT_BUTT_SLIDE, 0);
+        } else {
+            set_mario_action(m, ACT_STOMACH_SLIDE, 0);
+        }
+    // } else {
+    //     mario_set_forward_vel(m, 0.0f);
+    //     set_mario_action(m, slowAction, 0);
+    // }
 }
 
 s32 set_triple_jump_action(struct MarioState *m, UNUSED u32 action, UNUSED u32 actionArg) {
     if (m->flags & MARIO_WING_CAP) {
         return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
-    } else if (m->forwardVel > 20.0f) {
-        return set_mario_action(m, ACT_TRIPLE_JUMP, 0);
     } else {
-        return set_mario_action(m, ACT_JUMP, 0);
+        return set_mario_action(m, ACT_TRIPLE_JUMP, 0);
     }
 
     return FALSE;
@@ -206,9 +211,12 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 
     //! Speed is capped a frame late (butt slide HSG)
     m->forwardVel = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
-    if (m->forwardVel > 100.0f) {
-        m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
-        m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
+
+    print_text_fmt_int(98, 20, "%d", (int)m->forwardVel);
+    if (m->forwardVel > 200.0f && m->action == ACT_BUTT_SLIDE) {
+        // m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
+        // m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
+        set_mario_action(m, ACT_SLEEPING, 0);
     }
 
     if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
@@ -270,14 +278,14 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
         m->slideVelZ = m->slideVelZ * oldSpeed / newSpeed;
     }
 
-    update_sliding_angle(m, accel, lossFactor);
+    update_sliding_angle(m, accel, 1.01f);
 
     if (!mario_floor_is_slope(m) && m->forwardVel * m->forwardVel < stopSpeed * stopSpeed) {
         mario_set_forward_vel(m, 0.0f);
         stopped = TRUE;
     }
 
-    return stopped;
+    return FALSE;
 }
 
 void apply_slope_accel(struct MarioState *m) {
@@ -1880,17 +1888,19 @@ s32 act_double_jump_land(struct MarioState *m) {
 }
 
 s32 act_triple_jump_land(struct MarioState *m) {
-    m->input &= ~INPUT_A_PRESSED;
+    // m->input &= ~INPUT_A_PRESSED;
 
-    if (common_landing_cancels(m, &sTripleJumpLandAction, set_jumping_action)) {
-        return TRUE;
-    }
+    // if (common_landing_cancels(m, &sTripleJumpLandAction, set_jumping_action)) {
+    //     return TRUE;
+    // }
 
-    if (!(m->input & INPUT_NONZERO_ANALOG)) {
-        play_sound_if_no_flag(m, SOUND_MARIO_HAHA, MARIO_MARIO_SOUND_PLAYED);
-    }
+    // if (!(m->input & INPUT_NONZERO_ANALOG)) {
+    //     play_sound_if_no_flag(m, SOUND_MARIO_HAHA, MARIO_MARIO_SOUND_PLAYED);
+    // }
 
-    common_landing_action(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_FREEFALL);
+    // common_landing_action(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_FREEFALL);
+
+    set_mario_action(m, ACT_BUTT_SLIDE, 0);
     return FALSE;
 }
 
